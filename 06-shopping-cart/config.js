@@ -1,0 +1,1 @@
+export const IS_DEVELOPMENT = process.env.IS_DEVELOPMENT !== 'production';
