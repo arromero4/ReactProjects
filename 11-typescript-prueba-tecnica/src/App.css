@@ -5,3 +5,22 @@
   width: 100%;
 }
 
+.table--showColors tr:nth-child(odd) {
+  background: #333;
+}
+
+.table--showColors tr:nth-child(even) {
+  background: #555;
+}
+
+header{
+  display: flex;
+  margin-bottom:  16px;
+  justify-content: center;
+  align-items: center;
+  gap: 2,
+}
+
+.pointer{
+  cursor: crosshair;
+}
