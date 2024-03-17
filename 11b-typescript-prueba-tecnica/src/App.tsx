@@ -1,18 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo, useState } from 'react'
 import './App.css'
 import { UserList } from './components/UsersList'
 import { SortBy, type User } from './types.d'
+import { useUsers } from './hooks/useUsers'
+import { Results } from './components/Results'
 
+
+
+
+//PRUEBA TECNICA B - CON REACT QUERY
 function App() {
-  const [users, setUsers] = useState<User[]>([])
+  const { isLoading, isError, users, refetch, fetchNextPage, hasNextPage } = useUsers()
+
   const [showColors, setShowColors] = useState(false)
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE)
   const [filterCountry, setFilterCountry] = useState<string | null>(null)
-  const originalUsers = useRef<User[]>([])
+
+
+  //const originalUsers = useRef<User[]>([])
   // useRef para guardar un valor
   // que queremos que se comparta entre renderizados
   // pero que al cambiar, no vuelva a renderizar el componente
-  
+
 
   const toggleColors = () => {
     setShowColors(!showColors)
@@ -24,42 +34,34 @@ function App() {
 
   }
 
-  const handleReset = () => {
-    setUsers(originalUsers.current)
+  const handleReset =() => {    //setUsers(originalUsers.current)
+    void refetch()
   }
 
   const handleDelete = (email: string) => {
-    const filteredUsers = users.filter((user) => user.email !== email)
-    setUsers(filteredUsers)
+    //const filteredUsers = users.filter((user) => user.email !== email)
+    //setUsers(filteredUsers)
 
   }
-  
+
   const handleChangeSort = (sort: SortBy) => {
     setSorting(sort)
   }
 
-  useEffect(() => {
-    fetch('https://randomuser.me/api?results=100')
-      .then(async res => await res.json())
-      .then(res => {
-        setUsers(res.results)
-        originalUsers.current = res.results
-      })
-      .catch(err => {
-        console.error(err)
-      })
-  }, [])
 
-  const filteredUsers = useMemo(() => { 
+
+  const filteredUsers = useMemo(() => {
     return filterCountry !== null && filterCountry.length > 0
-  ? users.filter((user => {
-    return user.location.country.toLowerCase().includes(filterCountry.toLowerCase())
-  }))
-  : users
-}, [users, filterCountry])
+      ? users.filter((item) => {
+
+      })((user => {
+        return user.location.country.toLowerCase().includes(filterCountry.toLowerCase())
+      }))
+      : users
+  }, [users, filterCountry])
 
   const sortedUsers = useMemo(() => {
-    if(sorting === SortBy.NONE) return filteredUsers
+    if (sorting === SortBy.NONE) return filteredUsers
     const compareProperties: Record<string, (user: User) => any> = {
       [SortBy.COUNTRY]: user => user.location.country,
       [SortBy.NAME]: user => user.name.first,
@@ -77,6 +79,7 @@ function App() {
   return (
     <>
       <h1>Prueba técnica.</h1>
+      <Results />
       <header>
         <button onClick={toggleColors}>
           Colorear Filas
@@ -87,17 +90,30 @@ function App() {
         <button onClick={handleReset}>
           Resetear Estado
         </button>
-        <input type="text" placeholder='Filtra por país' onChange={(e) =>{
+        <input type="text" placeholder='Filtra por país' onChange={(e) => {
           setFilterCountry(e.target.value);
-        }}/>     
+        }} />
       </header>
       <main>
-        <UserList 
-          deleteUser = {handleDelete}
-          showColors={showColors} 
-          users={sortedUsers} 
-          changeSorting = {handleChangeSort}
-        />
+        {!isLoading && !isError && users.length > 0 &&
+          <UserList
+            deleteUser={handleDelete}
+            showColors={showColors}
+            users={sortedUsers}
+            changeSorting={handleChangeSort}
+          />}
+        {isLoading && <p>Cargando...</p>}
+
+        {isError && <p>Ha habido un error</p>}
+
+        {!isLoading && !isError && users.length === 0 && <p>No hay usuarios</p>}
+
+
+
+        {!isLoading && !isError && hasNextPage === true &&  <button onClick={() => {void fetchNextPage()}}>Cargar más resultados</button>}
+        
+        {!isLoading && !isError && hasNextPage === false  && <p>No hay más usuarios</p>}
+
       </main>
     </>
   )
