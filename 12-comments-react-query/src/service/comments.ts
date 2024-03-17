@@ -9,10 +9,10 @@ export interface CommentWithId extends Comment {
 }
 
 // ApiKey could be public as service is 100% free
-const apiKey = '$2b$10$jOpMXFaiNgsyhru7Nt.GouBUmHStWY9IRZR7vCocenxkK.vv7tDsu'
+const apiKey = '$2a$10$oKFn4V1Fcr5Koy4IV65L0uyTD1hbX81z6qdzmU3NizKTVwvg8edQi'
 
 export const getComments = async () => {
-  const response = await fetch('https://api.jsonbin.io/v3/b/643fbe2bc0e7653a05a77535', {
+  const response = await fetch('https://api.jsonbin.io/v3/b/65f6ab5f266cfc3fde999963', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -38,11 +38,11 @@ export const postComment = async (comment: Comment) => {
   const newComment = { ...comment, id }
   const commentsToSave = [...comments, newComment]
 
-  const response = await fetch('https://api.jsonbin.io/v3/b/643fbe2bc0e7653a05a77535', {
+  const response =await fetch('https://api.jsonbin.io/v3/b/65f6ab5f266cfc3fde999963', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-Access-Key': import.meta.env.VITE_PUBLIC_API_KEY
+      'X-Access-Key': apiKey
     },
     body: JSON.stringify(commentsToSave)
   })
